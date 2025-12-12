@@ -116,7 +116,7 @@ const confirmTrade = document.getElementById("confirmTrade");
 
 const buyBtn = document.getElementById("buyBtn");
 const sellBtn = document.getElementById("sellBtn");
-
+const sipBtn = document.getElementById("sipBtn");
 const toast = document.getElementById("toast");
 
 /* ============================================================
