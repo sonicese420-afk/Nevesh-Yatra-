@@ -14,7 +14,46 @@ const STOCKS = [
         history3M: [1500, 1520, 1530, 1540, 1556],
         history1M: [1530, 1540, 1556]
     },
-    ...
+
+    {
+        symbol: "TATAMOTORS",
+        name: "Tata Motors Ltd",
+        price: 373.45,
+        change: -0.8,
+        history6M: [310, 325, 330, 345, 350, 360, 373],
+        history3M: [340, 350, 360, 370, 373],
+        history1M: [360, 365, 373]
+    },
+
+    {
+        symbol: "HDFCBANK",
+        name: "HDFC Bank Ltd",
+        price: 1000.2,
+        change: +0.45,
+        history6M: [930, 950, 960, 980, 995, 1000],
+        history3M: [970, 990, 1000],
+        history1M: [980, 1000]
+    },
+
+    {
+        symbol: "WIPRO",
+        name: "Wipro Ltd",
+        price: 260.55,
+        change: -0.25,
+        history6M: [230, 240, 245, 250, 255, 258, 260],
+        history3M: [245, 250, 255, 258, 260],
+        history1M: [255, 258, 260]
+    },
+
+    {
+        symbol: "AFFLE",
+        name: "Affle India Ltd",
+        price: 1685.8,
+        change: +2.1,
+        history6M: [1530, 1580, 1600, 1630, 1670, 1685],
+        history3M: [1580, 1600, 1650, 1670, 1685],
+        history1M: [1670, 1685]
+    }
 ];
 
 /* MUTUAL FUNDS */
@@ -27,12 +66,21 @@ const FUNDS = [
         history3M: [16.8, 17.2, 18.0, 18.39],
         history1M: [17.8, 18.1, 18.39]
     },
-    ...
+
+    {
+        symbol: "HDFCMID",
+        name: "HDFC Mid Cap Fund",
+        nav: 114.21,
+        history6M: [104, 106, 108, 110, 111, 113, 114],
+        history3M: [110, 112, 114],
+        history1M: [113, 114]
+    }
 ];
 
 /* ============================================================
    APP STATE
 ============================================================ */
+
 let wallet = 10000;
 let portfolio = {};
 let orders = [];
@@ -66,11 +114,15 @@ const tradeBox = document.getElementById("tradeBox");
 const tradeInput = document.getElementById("tradeInput");
 const confirmTrade = document.getElementById("confirmTrade");
 
+const buyBtn = document.getElementById("buyBtn");
+const sellBtn = document.getElementById("sellBtn");
+
 const toast = document.getElementById("toast");
 
 /* ============================================================
    TOAST
 ============================================================ */
+
 function showToast(msg, error = false) {
     toast.textContent = msg;
     toast.classList.remove("hidden");
@@ -85,6 +137,7 @@ function showToast(msg, error = false) {
 /* ============================================================
    RENDER STOCKS
 ============================================================ */
+
 function renderStocks() {
     stocksList.innerHTML = "";
     STOCKS.forEach(stock => {
@@ -100,6 +153,7 @@ function renderStocks() {
                     <div class="card-symbol">${stock.symbol}</div>
                 </div>
             </div>
+
             <div class="card-price">
                 ₹${stock.price}
                 <div class="card-change ${stock.change >= 0 ? "green" : "red"}">
@@ -107,6 +161,7 @@ function renderStocks() {
                 </div>
             </div>
         `;
+
         stocksList.appendChild(card);
     });
 }
@@ -126,8 +181,10 @@ function renderFunds() {
                     <div class="card-symbol">${fund.symbol}</div>
                 </div>
             </div>
+
             <div class="card-price">₹${fund.nav}</div>
         `;
+
         fundsList.appendChild(card);
     });
 }
@@ -138,6 +195,7 @@ renderFunds();
 /* ============================================================
    NAVIGATION
 ============================================================ */
+
 navButtons.forEach(btn => {
     btn.addEventListener("click", () => {
         const target = btn.dataset.screen;
@@ -155,16 +213,19 @@ navButtons.forEach(btn => {
 /* ============================================================
    PROFILE PANEL
 ============================================================ */
+
 profileBtn.onclick = () => profilePanel.classList.add("active");
 closeProfile.onclick = () => profilePanel.classList.remove("active");
+
 addMoneyBtn.onclick = () => {
     wallet += 1000;
     walletBalance.textContent = wallet;
 };
 
 /* ============================================================
-   DETAIL SCREEN
+   DETAIL VIEW
 ============================================================ */
+
 function openDetail(asset, type) {
     activeAsset = asset;
     activeType = type;
@@ -203,7 +264,7 @@ function drawChart(history) {
                     tension: 0.3
                 }]
             },
-            options: { plugins: { legend: { display: false }} }
+            options: { plugins: { legend: { display: false } } }
         }
     );
 }
@@ -222,7 +283,7 @@ function openTrade(type) {
 
 function handleBuy() {
     let qty = Number(tradeInput.value);
-    if (qty <= 0) return showToast("Enter valid", true);
+    if (qty <= 0) return showToast("Enter valid quantity", true);
 
     let cost = qty * activeAsset.price;
     if (wallet < cost) return showToast("Insufficient funds", true);
@@ -240,7 +301,24 @@ function handleBuy() {
     tradeBox.classList.add("hidden");
 }
 
+function handleSell() {
+    let qty = Number(tradeInput.value);
+    if (qty <= 0) return showToast("Enter valid quantity", true);
+
+    if (!portfolio[activeAsset.symbol] || portfolio[activeAsset.symbol].qty < qty)
+        return showToast("Not enough quantity", true);
+
+    let value = qty * activeAsset.price;
+
+    portfolio[activeAsset.symbol].qty -= qty;
+    wallet += value;
+    walletBalance.textContent = wallet;
+
+    showToast("Sold!");
+    tradeBox.classList.add("hidden");
+}
+
 /* ============================================================
-   END DOMContentLoaded WRAPPER
+   END DOMContentLoaded
 ============================================================ */
 });
